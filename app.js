@@ -1,6 +1,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const exphbs = require("express-handlebars")
+const Todo = require("./models/todo")
 
 const app = express()
 
@@ -23,7 +24,11 @@ app.set('view engine', 'hbs')
 
 
 app.get('/', (req, res) => {
-  res.render('index')
+  //取得所有Todo資料
+  Todo.find()
+    .lean()
+    .then(todos => res.render('index', { todos }))
+    .catch(error => console.log(error))
 })
 
 app.listen(3000, () => {
