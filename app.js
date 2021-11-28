@@ -4,11 +4,11 @@ const exphbs = require("express-handlebars")
 const Todo = require("./models/todo")
 
 const app = express()
-
+//連接資料庫
 mongoose.connect("mongodb://localhost/todo-list")
 
 const db = mongoose.connection
-
+//取得連線狀態
 db.on('error', () => {
   console.log("mongodb error!")
 })
@@ -16,9 +16,9 @@ db.on('error', () => {
 db.once('open', () => {
   console.log("mongodb connected!")
 })
-
+//載入body-parser
 app.use(express.urlencoded({ extended: true }))
-
+//載入handlebars
 app.engine('hbs', exphbs.engine({ defaultLayout: 'main', extname: '.hbs'}))
 app.set('view engine', 'hbs')
 
@@ -42,11 +42,20 @@ app.post('/todos', (req, res) => {
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
   //另一種寫法，先在伺服器端建立實體再存入
-    //const todo = new Todo({ name })
+  //const todo = new Todo({ name })
   //return todo.save() 
     //.then(() => res.redirect('/'))
     //.catch(error => console.log(error))
 })
+
+app.get('/todos/:id', (req, res) => {
+  const id = req.params.id
+  return Todo.findById(id)
+    .lean()
+    .then((todo) => res.render('detail', { todo }))
+    .catch(error => console.log(error))
+})
+
 app.listen(3000, () => {
   console.log("App is running on port 3000")
 })
